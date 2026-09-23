@@ -1,0 +1,52 @@
+flowchart TB
+
+    Internet((Internet))
+    Devices[Trusted Devices]
+
+    subgraph Access["Access Layer"]
+        Traefik[Traefik Ingress]
+        WireGuard[WireGuard VPN]
+    end
+
+    subgraph Host["Dedicated Debian Host"]
+
+        K3s[k3s Kubernetes Cluster]
+
+        subgraph Platform["Platform Services"]
+            ArgoCD[Argo CD]
+            Gitea[Gitea]
+            Vaultwarden[Vaultwarden]
+        end
+
+        subgraph Apps["Application Workloads"]
+            Dashboard[Internal Dashboard]
+            PythonServices[Python Automation Services]
+        end
+
+        subgraph Data["Data & Messaging"]
+            PostgreSQL[(PostgreSQL)]
+            NATS[NATS]
+        end
+    end
+
+    Internet --> Traefik
+    Devices --> WireGuard
+
+    Traefik --> K3s
+    WireGuard --> K3s
+
+    K3s --> ArgoCD
+    K3s --> Gitea
+    K3s --> Vaultwarden
+    K3s --> Dashboard
+    K3s --> PythonServices
+    K3s --> PostgreSQL
+    K3s --> NATS
+
+    Gitea --> ArgoCD
+    ArgoCD --> Dashboard
+    ArgoCD --> PythonServices
+
+    Dashboard --> PostgreSQL
+    PythonServices --> PostgreSQL
+    PythonServices --> NATS
