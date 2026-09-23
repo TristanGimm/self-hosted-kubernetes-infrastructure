@@ -179,3 +179,5 @@ Published examples are sanitized or recreated specifically for documentation pur
 **Active / continuously evolving**
 
 The platform is actively used and extended as I continue working with Kubernetes, Linux, networking, automation and platform engineering.
+
+I continuously change my robots and develop new properties for my dashboard or change some things in my copier systems. Therefore this repo will change over time.
