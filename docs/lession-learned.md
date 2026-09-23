@@ -37,7 +37,7 @@ A connectivity problem that initially looks like an application issue may actual
 
 Testing each layer independently made troubleshooting significantly more effective. AI couldnt help much here because it went circles so i had to painfully solve it algorithmically.
 
-## Lesson: Comnplexer Authentication Increased Infrastructure Complexity Immensely.
+## Lesson: More Authentication Increased Infrastructure Complexity Immensely.
 
 I experimented with **Keycloak** for centralized authentication especially because of netbird.
 
