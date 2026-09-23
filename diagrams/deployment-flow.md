@@ -120,27 +120,4 @@ instead of relying only on:
 ghcr.io/example/trading-service:latest
 ```
 
-Using explicit image versions makes deployments easier to trace and roll back.
-
-## Security
-
-The public examples intentionally exclude:
-
-- registry credentials
-- CI secrets
-- repository access tokens
-- production repository URLs
-- Kubernetes secrets
-- proprietary application code
-- trading logic
-- broker credentials
-
-Secrets used by CI are stored outside the repository.
-
-## Related Documentation
-
-- [Architecture](architecture.md)
-- [GitOps](../docs/gitops.md)
-- [CI/CD](../docs/ci-cd.md)
-- [Applications](../docs/application.md)
-- [Operations](../docs/operations.md)
+Using explicit image versions makes deployments easier to trace and roll back to previous versions if something unintentionally breaks.
