@@ -1,32 +1,56 @@
-# Architecture Diagrams
+# Architecture & Deployment Diagrams
 
-This directory contains simplified visual documentation of the self-hosted Kubernetes platform.
+This directory contains high-level visual documentation of the self-hosted Kubernetes platform.
 
-The diagrams are intended to provide a high-level understanding of the infrastructure, deployment flow and platform design without exposing sensitive production details.
+The diagrams focus on the architecture and deployment workflows of the environment while intentionally omitting sensitive production details such as credentials, private network information, exact firewall rules and proprietary application logic.
 
-## Included Diagrams
+## Architecture
 
-### `architecture.png`
-Shows the high-level platform architecture, including:
+[View architecture](architecture.md)
 
-- Debian host
-- k3s cluster
-- Traefik ingress
-- WireGuard private access
-- Argo CD
+The architecture diagram provides an overview of the platform layers:
+
+- secure public and private access
+- dedicated Debian host
+- k3s Kubernetes cluster
+- platform services
+- internal application workloads
+- persistent data and messaging
+
+Key technologies include:
+
+- Debian Linux
+- k3s
+- Traefik
+- WireGuard
 - Gitea
+- Argo CD
 - Vaultwarden
 - PostgreSQL
 - NATS
-- internal dashboard 
-- Python automation and trading-related copier and robots
+- Python automation services
+- internal dashboard
 
-### `deployment-flow.png`
-Shows the CI/CD and GitOps deployment flow, including:
+## CI/CD & GitOps Deployment Flow
 
-- source code management in Gitea
-- CI pipeline execution
-- container image publishing
-- GitOps-based deployment updates
-- Argo CD synchronization
-- deployment into the k3s cluster
+[View deployment flow](deployment-flow.md)
+
+The deployment diagram describes how an application change moves from source control to a running workload.
+
+The intended workflow is:
+
+```text
+Developer
+   ↓
+Gitea
+   ↓
+CI Pipeline
+   ├──→ GitHub Container Registry
+   │
+   └──→ GitOps Configuration
+              ↓
+           Argo CD
+              ↓
+             k3s
+              ↓
+       Running Workload
