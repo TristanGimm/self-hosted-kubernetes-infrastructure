@@ -1,14 +1,16 @@
 # CI Examples
 
-This directory contains simplified examples of CI workflows used to demonstrate build, test and containerization patterns.
+This directory contains simplified examples of the CI patterns used in my infrastructure.
 
-Production workflows, credentials, private registries and proprietary application logic are intentionally excluded.
+The example workflow demonstrates how application source code can be built into an OCI container image and published to GitHub Container Registry.
 
 The general workflow is:
 
-1. Source code is pushed to Git
-2. CI validates and tests the application
-3. A container image is built
-4. The image is published to a registry
-5. Deployment configuration is updated
-6. Argo CD synchronizes the new desired state with Kubernetes
+1. Source code is pushed to Gitea.
+2. Gitea Actions executes the CI pipeline.
+3. The application is built into a container image.
+4. The image is published to GHCR.
+5. The GitOps configuration references the desired image version.
+6. Argo CD synchronizes the desired state into the k3s cluster.
+
+Production credentials, repository URLs and proprietary application code are intentionally excluded.
