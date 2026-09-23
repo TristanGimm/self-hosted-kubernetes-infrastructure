@@ -3,6 +3,21 @@
 The diagram below shows the high-level architecture of the self-hosted platform.  
 It is intentionally simplified and excludes sensitive production details.
 
+Architecture Layers
+Access Layer
+- Traefik handles ingress and routing for selected externally reachable services.
+- WireGuard provides secure access to private and administrative services.
+Platform Services
+- Gitea provides self-hosted source control.
+- Argo CD synchronizes Git-managed application state with Kubernetes.
+- Vaultwarden provides self-hosted password management.
+Application Workloads
+- Python Automation Services run internal automation and trading-related workloads.
+- Internal Dashboard provides visualization and management of internal data.
+Data & Messaging
+- PostgreSQL provides persistent relational storage.
+- NATS provides lightweight asynchronous messaging between services.
+
 ```mermaid
 flowchart TB
 
