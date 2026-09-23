@@ -18,8 +18,8 @@ Shows the high-level platform architecture, including:
 - Vaultwarden
 - PostgreSQL
 - NATS
-- internal dashboard
-- Python automation and trading-related services
+- internal dashboard 
+- Python automation and trading-related copier and robots
 
 ### `deployment-flow.png`
 Shows the CI/CD and GitOps deployment flow, including:
@@ -30,17 +30,3 @@ Shows the CI/CD and GitOps deployment flow, including:
 - GitOps-based deployment updates
 - Argo CD synchronization
 - deployment into the k3s cluster
-
-## Notes
-
-These diagrams are intentionally simplified.
-
-They do not include:
-
-- private IP addresses
-- credentials or secrets
-- internal domains
-- exact firewall rules
-- proprietary application logic
-- broker integrations
-- trading strategy internals
