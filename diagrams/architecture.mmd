@@ -9,44 +9,38 @@ flowchart TB
     end
 
     subgraph Host["Dedicated Debian Host"]
+        subgraph K3s["k3s Kubernetes Cluster"]
 
-        K3s[k3s Kubernetes Cluster]
+            subgraph Platform["Platform Services"]
+                Gitea[Gitea]
+                ArgoCD[Argo CD]
+                Vaultwarden[Vaultwarden]
+            end
 
-        subgraph Platform["Platform Services"]
-            ArgoCD[Argo CD]
-            Gitea[Gitea]
-            Vaultwarden[Vaultwarden]
-        end
+            subgraph Apps["Application Workloads"]
+                Dashboard[Internal Dashboard]
+                Robots[Python Automation Services]
+            end
 
-        subgraph Apps["Application Workloads"]
-            Dashboard[Internal Dashboard]
-            PythonServices[Python Automation Services]
-        end
+            subgraph Data["Data & Messaging"]
+                PostgreSQL[(PostgreSQL)]
+                NATS[NATS]
+            end
 
-        subgraph Data["Data & Messaging"]
-            PostgreSQL[(PostgreSQL)]
-            NATS[NATS]
         end
     end
 
     Internet --> Traefik
     Devices --> WireGuard
 
-    Traefik --> K3s
-    WireGuard --> K3s
+    Traefik --> Dashboard
+    WireGuard --> Platform
+    WireGuard --> Dashboard
 
-    K3s --> ArgoCD
-    K3s --> Gitea
-    K3s --> Vaultwarden
-    K3s --> Dashboard
-    K3s --> PythonServices
-    K3s --> PostgreSQL
-    K3s --> NATS
+    Gitea -->|Desired State| ArgoCD
+    ArgoCD -->|Deploy| Apps
 
-    Gitea --> ArgoCD
-    ArgoCD --> Dashboard
-    ArgoCD --> PythonServices
-
-    Dashboard --> PostgreSQL
-    PythonServices --> PostgreSQL
-    PythonServices --> NATS
+    Robots -->|Events| NATS
+    Robots -->|Persistent Data| PostgreSQL
+    Dashboard -->|Read / Write| PostgreSQL
+    Dashboard -->|Events| NATS
