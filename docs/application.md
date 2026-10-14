@@ -1,48 +1,21 @@
-# Application Workloads
+# Application workloads
 
-## Overview
+The current applications run in k3s. This repository documents their infrastructure context; it excludes proprietary code, trading logic, broker credentials and account information.
 
-The infrastructure hosts several custom internal applications and automation services.
+## Trading Dashboard
 
-Some of these workloads support proprietary trading and market-data workflows. The business logic itself is private, but the surrounding infrastructure patterns are documented here.
+The Dashboard has a web deployment and a worker deployment. The worker periodically synchronizes the configured Notion data source and updates the active PostgreSQL database in k3s. Notion credentials are stored in a Kubernetes Secret, not in this repository.
 
-## Python Automation Services
+The former Docker web and worker containers are stopped. The old Docker PostgreSQL container remains as a rollback copy; it is not the active dashboard database.
 
-Several Python-based services run as containerized workloads inside the platform.
+## Quant Engine
 
-Their responsibilities include tasks such as:
+The Quant Engine runs as a Kubernetes workload and stores token state on a persistent volume. It provides read-only market data and diagnostics and does not submit orders.
 
-- collecting external data
-- processing internal events
-- publishing messages
-- storing application data
-- communicating with internal services
-- providing data to dashboards which i access internally
+## Trade Copier
 
-## Trading-Related Workloads
+The Trade Copier runs in k3s and stores its state persistently. Its `ENGINE_TRADING_ENABLED` setting is false, so live trade execution is disabled.
 
-The platform also hosts proprietary trading-related services.
+## Monitoring
 
-The public repository intentionally does not include:
-
-- trading algorithms
-- execution logic
-- broker credentials
-- account information
-- proprietary strategy code
-
-From an infrastructure perspective, these workloads are treated like other internal applications:
-
-```mermaid
-flowchart LR
-    External[External Data Sources]
-    Service[Python Service]
-    NATS[NATS]
-    DB[(PostgreSQL)]
-    Dashboard[Internal Dashboard]
-
-    External --> Service
-    Service --> NATS
-    Service --> DB
-    NATS --> Dashboard
-    DB --> Dashboard
+Prometheus, Grafana and Alertmanager run in k3s. Prometheus scrapes Kubernetes metrics and node-exporter metrics from the Debian host. The Grafana overview shows CPU, memory, root filesystem use, pod state, restarts, unavailable replicas and scrape failures.

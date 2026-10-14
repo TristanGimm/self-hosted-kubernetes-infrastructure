@@ -1,183 +1,40 @@
 # Self-Hosted Kubernetes Infrastructure
 
-A self-hosted Debian and k3s platform for GitOps, private networking, automation, data services and internal applications.
+Documentation for a self-hosted platform running on one Debian server. The current setup uses k3s, Gitea Actions and Argo CD for the trading applications, with WireGuard-only access to web services.
 
-I actively operate and develop this environment as a practical platform for Kubernetes, Linux administration, networking, GitOps and infrastructure automation.
+> This public repository contains documentation and sanitized examples. Production manifests and secrets are kept separately. The same named repository in private Gitea is a separate copy used by Argo CD; it is not automatically synchronized with this GitHub repository.
 
-> This repository contains architecture documentation and sanitized examples only.  
-> Production credentials, private network information and proprietary application code are intentionally excluded.
+## Current architecture
 
----
+- One Debian 13 server runs a single-node k3s cluster.
+- WireGuard runs on the host.
+- Caddy runs in Docker on the host, terminates TLS and forwards app traffic to Traefik inside k3s.
+- Gitea, its Actions runner, Argo CD, Prometheus, Grafana and Alertmanager run in k3s.
+- The Quant Engine, Trading Dashboard web and Notion-sync worker, Trade Copier, and dashboard PostgreSQL run in k3s.
+- Vaultwarden remains in Docker outside k3s. A legacy trading PostgreSQL container remains as a rollback copy.
+- Persistent volumes use local-path storage on the server disk; there is no replicated storage.
+- The Trade Copier is deployed with live trading disabled. Robots and backtesting workers are future workloads. NATS is not deployed.
 
-## Overview
+## Architecture and delivery
 
-The platform runs on a dedicated **Debian Linux** server with **k3s** as the Kubernetes distribution.
+- [Platform architecture](diagrams/architecture.md)
+- [CI/CD deployment flow](diagrams/deployment-flow.md)
 
-It hosts platform services, internal applications and automation workloads while providing practical experience with:
-
-- Kubernetes operations
-- GitOps
-- Linux administration
-- private networking
-- ingress and service exposure
-- CI/CD
-- persistent data
-- asynchronous messaging
-- infrastructure troubleshooting
-
-Some workloads support internal software and automated trading-related systems, while the infrastructure itself is designed as a general-purpose self-hosted platform.
-
----
-
-## Platform Architecture
-
-```mermaid
-flowchart LR
-
-    Access["Access
-    Traefik · WireGuard"]
-
-    Platform["Platform
-    Gitea · Argo CD · Vaultwarden"]
-
-    Apps["Applications
-    Dashboard · Python Services"]
-
-    Data["Data & Messaging
-    PostgreSQL · NATS"]
-
-    Access --> Platform
-    Platform --> Apps
-    Apps --> Data
-```
-
-For the complete architecture:
-
-**[View Platform Architecture →](diagrams/architecture.md)**
-
-For the application delivery process:
-
-**[View CI/CD & GitOps Deployment Flow →](diagrams/deployment-flow.md)**
-
----
-
-## Technology Stack
-
-| Area | Technologies |
-|---|---|
-| **Host & Orchestration** | Debian Linux, k3s, Kubernetes |
-| **GitOps** | Git, Gitea, Argo CD |
-| **Networking** | Traefik, WireGuard |
-| **Data & Messaging** | PostgreSQL, NATS |
-| **Applications** | Python services, internal dashboard |
-| **Internal Services** | Vaultwarden |
-| **Container Delivery** | CI pipeline, GHCR |
-
----
-
-## Engineering Focus
-
-The project is built around a few principles:
-
-- **Git as source of truth**
-- **private-by-default infrastructure**
-- **minimal public exposure**
-- **declarative deployments**
-- **clear separation between platform and applications**
-- **automation of repetitive operations**
-- **simplicity over unnecessary infrastructure complexity**
-
-The environment has also involved real troubleshooting around VPN connectivity, routing, MTU behavior, firewalling, Kubernetes networking and service reachability.
-
----
+Application workflows build images into the private Gitea Container Registry and update the private GitOps repository. Argo CD syncs that desired state into k3s.
 
 ## Documentation
 
-| Topic | Documentation |
-|---|---|
-| Platform design | [Architecture](docs/architecture.md) |
-| Networking & VPN | [Networking](docs/networking.md) |
-| GitOps | [GitOps](docs/gitops.md) |
-| CI/CD | [CI/CD](docs/ci-cd.md) |
-| Application workloads | [Applications](docs/application.md) |
-| Operations & troubleshooting | [Operations](docs/operations.md) |
-| Engineering takeaways | [Lessons Learned](docs/lessons-learned.md) |
+- [Architecture](docs/architecture.md)
+- [Networking and VPN](docs/networking.md)
+- [GitOps](docs/gitops.md)
+- [CI/CD](docs/ci-cd.md)
+- [Applications](docs/application.md)
+- [Operations](docs/operations.md)
+- [Lessons learned](docs/lessons-learned.md)
+- [Examples](examples/)
 
----
+## Operational limits
 
-## Examples
+A host, disk or k3s failure can interrupt every Kubernetes workload. Local-path volumes do not provide replication or node failover. WireGuard and Caddy run outside k3s, so the VPN and TLS entry point do not depend on the cluster starting; services behind Traefik do.
 
-The [`examples/`](examples/) directory contains simplified and sanitized examples of infrastructure patterns used by the platform.
-
-```text
-examples/
-├── argocd/
-│   └── application-example.yaml
-├── ci/
-│   └── pipeline-example.yaml
-├── kubernetes/
-│   ├── deployment-example.yaml
-│   ├── ingress-example.yaml
-│   ├── namespace.yaml
-│   ├── pvc-example.yaml
-│   └── service-example.yaml
-└── networking/
-    └── network-policy-example.yaml
-```
-
-These examples demonstrate concepts without exposing production configuration.
-
----
-
-## Repository Structure
-
-```text
-.
-├── README.md
-├── diagrams/
-│   ├── README.md
-│   ├── architecture.md
-│   └── deployment-flow.md
-├── docs/
-│   ├── README.md
-│   ├── architecture.md
-│   ├── application.md
-│   ├── ci-cd.md
-│   ├── gitops.md
-│   ├── lessons-learned.md
-│   ├── networking.md
-│   └── operations.md
-└── examples/
-    ├── argocd/
-    ├── ci/
-    ├── kubernetes/
-    └── networking/
-```
-
----
-
-## Security
-
-This repository intentionally does not contain:
-
-- credentials or API tokens
-- SSH or VPN keys
-- private IP addresses
-- internal DNS information
-- production secrets
-- security-sensitive firewall configuration
-- broker or trading account credentials
-- proprietary trading algorithms
-- complete production manifests
-
-Published examples are sanitized or recreated specifically for documentation purposes.
-
----
-
-## Status
-
-**Active / continuously evolving**
-
-The platform is actively used and extended as I continue working with Kubernetes, Linux, networking, automation and platform engineering.
-
-I continuously change my robots and develop new properties for my dashboard or change some things in my copier systems. Therefore this repo will change over time.
+This repository excludes credentials, tokens, VPN keys, private addresses, production manifests, account details and proprietary trading logic.

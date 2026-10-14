@@ -1,17 +1,13 @@
 # Documentation
 
-This directory contains the technical documentation for my self-hosted Kubernetes platform.
+This documentation describes the deployed infrastructure and the limits of the single-server setup.
 
-The documentation focuses on architecture, operational decisions and practical experience rather than exposing complete production configuration.
+- [Architecture](architecture.md) — host, cluster, services and storage
+- [Networking](networking.md) — WireGuard, Caddy, Traefik and access policy
+- [GitOps](gitops.md) — private Gitea manifests and Argo CD
+- [CI/CD](ci-cd.md) — Gitea Actions and image delivery
+- [Applications](application.md) — current workloads and data
+- [Operations](operations.md) — checks, backups and recovery
+- [Lessons learned](lessons-learned.md) — design decisions
 
-## Contents
-
-- [Architecture](architecture.md) — platform structure and responsibilities
-- [GitOps](gitops.md) — Git-based deployment with Argo CD
-- [CI/CD](ci-cd.md) — build and container image workflow
-- [Networking](networking.md) — ingress, VPN and private access
-- [Applications](application.md) — internal application workloads
-- [Operations](operations.md) — maintenance and troubleshooting
-- [Lessons Learned](lessons-learned.md) — key engineering takeaways
-
-Visual diagrams are available in [`../diagrams`](../diagrams/README.md).
+See [diagrams](../diagrams/README.md). Files under [examples](../examples/) are sanitized patterns, not production manifests.

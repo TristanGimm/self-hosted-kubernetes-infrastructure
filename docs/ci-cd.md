@@ -1,26 +1,19 @@
-# CI/CD Architecture
+# CI/CD
 
-## Overview
+Gitea Actions builds the application images. Argo CD deploys the image versions recorded in the private GitOps repository.
 
-The platform separates Continuous Integration from deployment orchestration.
+## Current flow
 
-CI is responsible for validating, building and packaging application changes, while Argo CD handles deployment through GitOps.
+1. Push a change to `main` or manually start the build workflow from a repository’s Actions page.
+2. Gitea Actions runs `.gitea/workflows/build-images.yaml` on the self-hosted runner.
+3. The workflow builds and publishes an image to the private Gitea Container Registry.
+4. It commits the new image reference to the private GitOps repository.
+5. Argo CD synchronizes that desired state to k3s.
 
-## High-Level Flow
+The Quant Engine, Trading Dashboard and Trade Copier workflows support both push-to-`main` and `workflow_dispatch`. The runner is on the same server as production workloads, so builds share CPU, memory and disk with applications.
 
-```mermaid
-flowchart LR
-    Dev[Developer]
-    Git[Gitea]
-    CI[CI Pipeline]
-    Registry[Container Registry]
-    Config[Deployment Repository]
-    Argo[Argo CD]
-    K3s[k3s Cluster]
+## Repository boundaries
 
-    Dev -->|Push| Git
-    Git --> CI
-    CI -->|Build & Test| Registry
-    CI -->|Update image reference| Config
-    Config --> Argo
-    Argo --> K3s
+The public GitHub repository containing these documents is separate from the private Gitea GitOps repository. It is not automatically mirrored and changes here do not update what Argo CD watches.
+
+There is no Jenkins service or GitHub Container Registry in the current delivery path. Use immutable image tags to trace and roll back deployments.
