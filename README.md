@@ -2,8 +2,6 @@
 
 Documentation for a self-hosted platform running on one Debian server. The current setup uses k3s, Gitea Actions and Argo CD for the trading applications, with WireGuard-only access to web services.
 
-> This public repository contains documentation and sanitized examples. Production manifests and secrets are kept separately. The same named repository in private Gitea is a separate copy used by Argo CD; it is not automatically synchronized with this GitHub repository.
-
 ## Current architecture
 
 - One Debian 13 server runs a single-node k3s cluster.
@@ -12,6 +10,7 @@ Documentation for a self-hosted platform running on one Debian server. The curre
 - Gitea, its Actions runner, Argo CD, Prometheus, Grafana and Alertmanager run in k3s.
 - The Quant Engine, Trading Dashboard web and Notion-sync worker, Trade Copier, and dashboard PostgreSQL run in k3s.
 - Vaultwarden remains in Docker outside k3s. A legacy trading PostgreSQL container remains as a rollback copy.
+- Application source is edited on public GitHub and synchronized into private Gitea before each build, so a GitHub push alone starts the chain.
 - Persistent volumes use local-path storage on the server disk; there is no replicated storage.
 - The Trade Copier is deployed with live trading disabled. Robots and backtesting workers are future workloads. NATS is not deployed.
 
@@ -20,7 +19,7 @@ Documentation for a self-hosted platform running on one Debian server. The curre
 - [Platform architecture](diagrams/architecture.md)
 - [CI/CD deployment flow](diagrams/deployment-flow.md)
 
-Application workflows build images into the private Gitea Container Registry and update the private GitOps repository. Argo CD syncs that desired state into k3s.
+Application source is synchronized from public GitHub into private Gitea, on every push and on a short repeating schedule. Application workflows then build images into the private Gitea Container Registry and update the private GitOps repository. Argo CD syncs that desired state into k3s.
 
 ## Documentation
 

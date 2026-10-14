@@ -14,6 +14,12 @@ The platform consists of one Debian 13 server and one k3s node. It is a personal
 | Applications | Quant Engine, Trading Dashboard web/worker, Trade Copier |
 | Data | Trading PostgreSQL and local-path persistent volumes |
 
+## Source flow
+
+Application code is edited on public GitHub and synchronized into private Gitea by a Gitea Actions workflow. A GitHub webhook dispatches the sync immediately on push; a short repeating schedule runs the same workflow as a fallback for a missed delivery. The sync copies the GitHub working tree into the Gitea repository, keeps the `.gitea` workflow directory out of the copy so the definitions that perform the sync survive, and records the upstream commit SHA next to the source.
+
+The desired state Argo CD watches is not synchronized this way. The private Gitea infrastructure repository is maintained directly and is the only source Argo CD reconciles. This public documentation repository holds no production manifests.
+
 ## Request path
 
 ```text

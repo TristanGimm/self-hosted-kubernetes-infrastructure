@@ -23,6 +23,9 @@ flowchart LR
         Prom["Prometheus + Alertmanager"] --> Node["node-exporter and Kubernetes metrics"]
     end
 
+    GitHub["Public GitHub repositories"] -->|"webhook on push"| Sync["sync-upstream workflow"]
+    Sync -->|"copy source, dispatch build"| Gitea
+
     Caddy --> Vault["Vaultwarden in Docker"]
     LegacyDB["Legacy Docker PostgreSQL (rollback copy)"]
 ```
@@ -48,4 +51,8 @@ The Dashboard web service and worker use PostgreSQL. The worker syncs the config
 
 ## Source of truth
 
-Argo CD’s `trading-services` application watches the `kubernetes/apps` path in a private Gitea infrastructure repository. This public GitHub documentation repository is a separate copy and does not automatically update the private repository.
+Two flows meet in Gitea, and they point in opposite directions.
+
+Application source flows inwards. The Quant Engine, Trading Dashboard and Trade Copier repositories are synchronized from public GitHub into private Gitea: a GitHub webhook dispatches the sync on push, and a short repeating schedule covers a missed delivery. GitHub is where application code is edited.
+
+The infrastructure repository flows the other way. Argo CD’s `trading-services` application watches the `kubernetes/apps` path in the private Gitea infrastructure repository, which is maintained directly. This public GitHub documentation repository is a separate copy, is not synchronized into Gitea, and holds no production manifests.

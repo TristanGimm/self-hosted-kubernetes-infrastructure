@@ -8,7 +8,9 @@ Gitea Actions does not deploy directly to Kubernetes. After publishing an image,
 
 ## Public and private copies
 
-This public GitHub repository is a separate documentation copy. It is not the source watched by Argo CD and is not automatically synchronized with the private Gitea repository.
+The private Gitea infrastructure repository is maintained directly and is the source watched by Argo CD. This public GitHub repository is a documentation copy; it is not synchronized into Gitea, and it deliberately holds no production manifests.
+
+The application repositories work in the opposite direction. Quant Engine, Trading Dashboard and Trade Copier are synchronized from public GitHub into private Gitea, on every GitHub push and on a short repeating schedule as a fallback. See [CI/CD](ci-cd.md).
 
 ## Operational guidance
 
